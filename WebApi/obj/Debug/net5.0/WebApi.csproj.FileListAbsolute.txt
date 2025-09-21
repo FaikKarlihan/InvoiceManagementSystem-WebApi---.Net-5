@@ -49,3 +49,4 @@ C:\Users\Faik\Documents\Sites\InvoiceManagementSystem\webapi\obj\Debug\net5.0\re
 C:\Users\Faik\Documents\Sites\InvoiceManagementSystem\webapi\obj\Debug\net5.0\WebApi.pdb
 C:\Users\Faik\Documents\Sites\InvoiceManagementSystem\webapi\obj\Debug\net5.0\WebApi.genruntimeconfig.cache
 C:\Users\Faik\Documents\Sites\InvoiceManagementSystem\webapi\obj\Debug\net5.0\ref\WebApi.dll
+C:\Users\Faik\Documents\Sites\InvoiceManagementSystem\webapi\obj\Debug\net5.0\WebApi.sourcelink.json
