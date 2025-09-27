@@ -13,6 +13,7 @@ namespace WebApi.Data
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<RevokedToken> RevokedTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

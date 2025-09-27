@@ -13,6 +13,7 @@ namespace WebApi.Data
         DbSet<Invoice> Invoices { get; set; }
         DbSet<Message> Messages { get; set; }
         DbSet<Payment> Payments { get; set; }
+        DbSet<RevokedToken> RevokedTokens { get; set; }
     
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

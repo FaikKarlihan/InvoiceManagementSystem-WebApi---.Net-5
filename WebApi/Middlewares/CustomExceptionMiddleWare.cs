@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Services;
 
-namespace WebApi.Middlwares
+namespace WebApi.Middlewares
 {
     public class CustomExceptionMiddleware
     {
