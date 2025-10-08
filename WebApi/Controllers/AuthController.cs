@@ -1,5 +1,7 @@
+using System;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Dtos;
 using WebApi.Entities;
@@ -21,11 +23,15 @@ namespace WebApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var response = await _authService.AuthenticateAsync(request.Username, request.Password);
-            if (response == null)
-                return Unauthorized(new { message = "Invalid username or password" });
-
-            return Ok(response); // AccessToken returns
+            try
+            {
+                var response = await _authService.AuthenticateAsync(request.Mail, request.Password);
+                return Ok(response); // access token
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
         }
 
         [HttpPost("logout")]

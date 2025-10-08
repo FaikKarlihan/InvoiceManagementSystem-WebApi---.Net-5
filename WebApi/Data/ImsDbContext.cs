@@ -21,6 +21,17 @@ namespace WebApi.Data
             modelBuilder.Entity<Housing>().Property(h => h.PlanType).HasConversion<string>();
             modelBuilder.Entity<Housing>().Property(h => h.ApartmentStatus).HasConversion<string>();
             modelBuilder.Entity<User>().Property(u => u.Role).HasConversion<string>();
+
+            // User table dependent, Housing table principal
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Housing)      // User → navigation property
+                .WithOne(h => h.User)        // Housing → navigation property
+                .HasForeignKey<User>(u => u.HousingId);  // FK User.HousingId
+
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Housing)
+                .WithMany(h => h.Invoices)
+                .HasForeignKey(i => i.HousingId);
         }
 
     }

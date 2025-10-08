@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Authentication;
 using WebApi.Data;
 using WebApi.Dtos;
 using WebApi.Entities;
+using WebApi.Repositories;
 
 namespace WebApi.Services
 {
@@ -13,6 +15,7 @@ namespace WebApi.Services
     {
         private readonly ImsDbContext _context;
         private readonly TokenGenerator _tokenGenerator;
+        private readonly IUserRepository _userRepo;
 
         public AuthService(ImsDbContext context, TokenGenerator tokenGenerator)
         {
@@ -20,20 +23,29 @@ namespace WebApi.Services
             _tokenGenerator = tokenGenerator;
         }
 
-        public async Task<LoginResponse> AuthenticateAsync(string username, string password)
+        public async Task<LoginResponse> AuthenticateAsync(string mail, string passwordHash)
         {
             // find user in db
-            var user = await _context.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Name == username && u.Password == password);
+            var user = await _userRepo.GetByMailAsync(mail);
 
             if (user == null)
-                throw new InvalidOperationException("User not found. Check the username and password.");
+                throw new InvalidOperationException("User not found. Please check your email.");
 
             // Create token
-            var accessToken = _tokenGenerator.GenerateToken(user);
+            var passwordHasher = new PasswordHasher<User>();
+            var verificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, passwordHash);
 
-            return new LoginResponse { AccessToken = accessToken };
+            if (verificationResult == PasswordVerificationResult.Failed)
+                throw new InvalidOperationException("Password is incorrect.");
+
+            var token = _tokenGenerator.GenerateToken(user);
+
+            return new LoginResponse
+            {
+                Mail = user.Mail,
+                Role = user.Role.ToString(),
+                AccessToken = token
+            };
         }
 
         public async Task LogoutAsync(string token)

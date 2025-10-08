@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using WebApi.Entities; // User entity namespace
+using WebApi.Entities;
 
 namespace WebApi.Authentication
 {
@@ -24,8 +24,9 @@ namespace WebApi.Authentication
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new(JwtRegisteredClaimNames.UniqueName, user.Name),
-                new(ClaimTypes.Role, user.Role.ToString()), // Enum string olarak
+                new(JwtRegisteredClaimNames.UniqueName, user.Mail),
+                new(JwtRegisteredClaimNames.Email, user.Mail), // backward compatibility
+                new(ClaimTypes.Role, user.Role.ToString()), // Enum as string
                 new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
             };
 

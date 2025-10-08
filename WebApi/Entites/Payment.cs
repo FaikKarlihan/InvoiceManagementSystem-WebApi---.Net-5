@@ -8,16 +8,12 @@ namespace WebApi.Entities
         public int Id { get; set; }
 
         public DateTime PaymentDate { get; set; }
-        public decimal Amount { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string PaymentInfo { get; set; }
-
+        public int InvoiceId { get; set; }
+        public Invoice Invoice { get; set; }
+        
         public int UserId { get; set; }
         public User User { get; set; }
-        public int HousingId { get; set; }
-        public Housing Housing { get; set; }
 
     }
 }

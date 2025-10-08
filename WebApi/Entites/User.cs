@@ -17,7 +17,7 @@ namespace WebApi.Entities
 
         [Required]
         [MaxLength(11)]
-        public string TC { get; set; }
+        public string NationalId { get; set; }
 
         [Required]
         [MaxLength(50)]
@@ -28,7 +28,10 @@ namespace WebApi.Entities
         public string PhoneNumber { get; set; }
 
         public string NumberPlate { get; set; } = ("-");
-        public string Password { get; set; }
+        public string PasswordHash  { get; set; }
         public Role Role { get; set; } = Role.User;
+
+        public int? HousingId  { get; set; }
+        public Housing Housing { get; set; }
     }
 }

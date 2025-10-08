@@ -68,9 +68,15 @@ namespace WebApi.Migrations
                         .HasMaxLength(2)
                         .HasColumnType("character varying(2)");
 
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PlanType")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -87,11 +93,16 @@ namespace WebApi.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<int>("HousingId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("InvoiceDate")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<string>("PaymentInfo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -112,9 +123,6 @@ namespace WebApi.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("SenderId")
                         .HasColumnType("integer");
 
@@ -128,8 +136,6 @@ namespace WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReceiverId");
-
                     b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
@@ -142,26 +148,18 @@ namespace WebApi.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("HousingId")
+                    b.Property<int>("InvoiceId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("PaymentInfo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HousingId");
+                    b.HasIndex("InvoiceId");
 
                     b.HasIndex("UserId");
 
@@ -197,6 +195,9 @@ namespace WebApi.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int?>("HousingId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Mail")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -207,10 +208,15 @@ namespace WebApi.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<string>("NationalId")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)");
+
                     b.Property<string>("NumberPlate")
                         .HasColumnType("text");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
@@ -227,12 +233,10 @@ namespace WebApi.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<string>("TC")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("character varying(11)");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("HousingId")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -251,7 +255,7 @@ namespace WebApi.Migrations
             modelBuilder.Entity("WebApi.Entities.Invoice", b =>
                 {
                     b.HasOne("WebApi.Entities.Housing", "Housing")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("HousingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -261,28 +265,20 @@ namespace WebApi.Migrations
 
             modelBuilder.Entity("WebApi.Entities.Message", b =>
                 {
-                    b.HasOne("WebApi.Entities.User", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WebApi.Entities.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Receiver");
-
                     b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("WebApi.Entities.Payment", b =>
                 {
-                    b.HasOne("WebApi.Entities.Housing", "Housing")
+                    b.HasOne("WebApi.Entities.Invoice", "Invoice")
                         .WithMany()
-                        .HasForeignKey("HousingId")
+                        .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -292,7 +288,23 @@ namespace WebApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Invoice");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Entities.User", b =>
+                {
+                    b.HasOne("WebApi.Entities.Housing", "Housing")
+                        .WithOne("User")
+                        .HasForeignKey("WebApi.Entities.User", "HousingId");
+
                     b.Navigation("Housing");
+                });
+
+            modelBuilder.Entity("WebApi.Entities.Housing", b =>
+                {
+                    b.Navigation("Invoices");
 
                     b.Navigation("User");
                 });

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApi.Entities
 {
@@ -6,8 +7,12 @@ namespace WebApi.Entities
     {
         public int Id { get; set; }
 
-        public DateTime InvoiceDate { get; set; }
+        public DateTime DueDate { get; set; }
         public decimal Amount { get; set; }
+        
+        [Required]
+        [MaxLength(100)]
+        public string PaymentInfo { get; set; }
 
         public int HousingId { get; set; }
         public Housing Housing { get; set; }

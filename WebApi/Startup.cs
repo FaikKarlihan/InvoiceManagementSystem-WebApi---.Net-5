@@ -1,24 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using WebApi.Authentication;
-using WebApi.Data;
+using WebApi.Extensions;
 using WebApi.Middlewares;
-using WebApi.Services;
+using WebApi.Validators;
+
 
 namespace WebApi
 {
@@ -34,68 +23,13 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            var key = Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]);
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
+            services.AddControllers()
+                    .AddFluentValidation(fv =>
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = Configuration["Jwt:Issuer"],
-                        ValidAudience = Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ClockSkew = TimeSpan.Zero 
-                    };
-                });
-
-            services.AddAuthorization();
-
-
-            
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
-
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "JWT Authorization header using the Bearer scheme."
-                });
-
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                        },
-                        Array.Empty<string>()
-                    }
-                });
-            });
-
-            services.AddScoped<TokenGenerator>();
-
-            services.AddScoped<IAuthService, AuthService>();
-
-            services.AddSingleton<IloggerService, ConsoleLogger>();
-
-            services.AddScoped<IImsDbContext>(provider => provider.GetService<ImsDbContext>());
-
-            services.AddDbContext<ImsDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-
-            services.Configure<JwtSettings>(Configuration.GetSection("Jwt"));
+                        fv.RegisterValidatorsFromAssemblyContaining<UserCreateDtoValidator>();
+                        // Here, all validators in the assembly where the given validator is located are recorded.
+                    });
+            services.AddApplicationServices(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
