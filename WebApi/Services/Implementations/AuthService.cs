@@ -13,12 +13,13 @@ namespace WebApi.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly ImsDbContext _context;
+        private readonly ImsDbContext _context; // We tolerate DB operations in the service since only one operation is performed.
         private readonly TokenGenerator _tokenGenerator;
         private readonly IUserRepository _userRepo;
 
-        public AuthService(ImsDbContext context, TokenGenerator tokenGenerator)
+        public AuthService(IUserRepository userRepo, ImsDbContext context, TokenGenerator tokenGenerator)
         {
+            _userRepo = userRepo;
             _context = context;
             _tokenGenerator = tokenGenerator;
         }
@@ -56,7 +57,8 @@ namespace WebApi.Services
                 RevokedAt = DateTime.UtcNow
             };
 
-            _context.RevokedTokens.Add(revoked);
+            // this one
+            _context.RevokedTokens.Add(revoked); 
             await _context.SaveChangesAsync();
         }
     }

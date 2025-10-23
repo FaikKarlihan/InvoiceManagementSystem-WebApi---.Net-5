@@ -1,6 +1,7 @@
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
@@ -45,5 +46,12 @@ namespace WebApi.Repositories
             _context.Set<T>().Remove(entity);
             await _context.SaveChangesAsync();
         }
+        public async Task<List<T>> GetWhereAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>()
+                .Where(predicate)
+                .ToListAsync();
+        }
+
     }
 }

@@ -11,6 +11,9 @@ using WebApi.Data;
 using WebApi.Authentication;
 using Microsoft.AspNetCore.Identity;
 using WebApi.Entities;
+using WebApi.Common;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace WebApi.Extensions
 {
@@ -24,6 +27,7 @@ namespace WebApi.Extensions
             services.AddAuthentication("Bearer")
                 .AddJwtBearer(options =>
                 {
+                    options.MapInboundClaims = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -33,23 +37,28 @@ namespace WebApi.Extensions
                         ValidIssuer = configuration["Jwt:Issuer"],
                         ValidAudience = configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ClockSkew = TimeSpan.Zero
+                        ClockSkew = TimeSpan.Zero,
                     };
                 });
-
-            services.AddAuthorization();
-
-            // Database
-            services.AddDbContext<ImsDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddScoped<IImsDbContext>(provider => provider.GetService<ImsDbContext>());
 
             // JWT Helper
             services.AddScoped<TokenGenerator>();
 
             // Password Hasher
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+            // Authorization
+            services.AddAuthorization();
+            services.AddHttpContextAccessor();
+
+            // AutoMapper
+            services.AddAutoMapper(typeof(MappingProfile));
+
+            // Database
+            services.AddDbContext<ImsDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddScoped<IImsDbContext>(provider => provider.GetService<ImsDbContext>());
 
             // Logger
             services.AddSingleton<IloggerService, ConsoleLogger>();
@@ -90,11 +99,15 @@ namespace WebApi.Extensions
 
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
-
+            services.AddScoped<IHousingRepository, HousingRepository>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 
             // Services
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IInvoiceService, InvoiceService>();
+            // add housing service
 
         }
     }

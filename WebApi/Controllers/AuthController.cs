@@ -23,15 +23,8 @@ namespace WebApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            try
-            {
-                var response = await _authService.AuthenticateAsync(request.Mail, request.Password);
-                return Ok(response); // access token
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Unauthorized(new { message = ex.Message });
-            }
+            var response = await _authService.AuthenticateAsync(request.Mail, request.Password);
+            return Ok(response); // access token
         }
 
         [HttpPost("logout")]

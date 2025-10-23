@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebApi.Common;
 using WebApi.Entities;
 
 namespace WebApi.Data
@@ -32,6 +33,10 @@ namespace WebApi.Data
                 .HasOne(i => i.Housing)
                 .WithMany(h => h.Invoices)
                 .HasForeignKey(i => i.HousingId);
+                
+            modelBuilder.Entity<Invoice>()
+                .Property(i => i.PaymentStatus)
+                .HasDefaultValue(PaymentStatus.NotPaid);
         }
 
     }

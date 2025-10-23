@@ -17,13 +17,13 @@ namespace WebApi.Middlewares
 
         public async Task InvokeAsync(HttpContext context, ImsDbContext dbContext)
         {
-            // Authorization header var mı kontrol et
+            // Check if there is an authorization header
             var authHeader = context.Request.Headers["Authorization"].ToString();
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
             {
                 var token = authHeader.Replace("Bearer ", "").Trim();
 
-                // Token revokedTokens tablosunda var mı?
+                // Is the token in the revokedTokens table?
                 var isRevoked = await dbContext.RevokedTokens
                                                .AsNoTracking()
                                                .AnyAsync(x => x.Token == token);
@@ -31,12 +31,13 @@ namespace WebApi.Middlewares
                 if (isRevoked)
                 {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("Token has been revoked.");
-                    return; // request'i durdur
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsync("{\"error\": \"Token has been revoked.\"}");
+                    return;
                 }
             }
 
-            // Token geçerli veya header yok → request devam etsin
+            // Token is valid or header is missing → continue request
             await _next(context);
         }
 

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System;
 
 namespace WebApi.Entities

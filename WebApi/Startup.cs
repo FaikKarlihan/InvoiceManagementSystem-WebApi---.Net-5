@@ -1,6 +1,9 @@
+using System.Linq;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,6 +33,24 @@ namespace WebApi
                         // Here, all validators in the assembly where the given validator is located are recorded.
                     });
             services.AddApplicationServices(Configuration);
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState
+                        .Where(x => x.Value.Errors.Count > 0)
+                        .SelectMany(x => x.Value.Errors)
+                        .Select(x => x.ErrorMessage)
+                        .ToList();
+            
+                    var result = new
+                    {
+                        errors
+                    };
+            
+                    return new BadRequestObjectResult(result);
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,13 +64,15 @@ namespace WebApi
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
 
-                app.UseAuthentication();
-                app.UseAuthorization();
 
-                app.UseRevokedTokenMiddleware();
+            app.UseRevokedTokenMiddleware(); // bak logout !!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            
 
             app.UseCustomExceptionMiddleware();
 

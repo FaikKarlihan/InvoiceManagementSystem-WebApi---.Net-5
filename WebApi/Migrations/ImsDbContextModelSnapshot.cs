@@ -99,10 +99,27 @@ namespace WebApi.Migrations
                     b.Property<int>("HousingId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Month")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OverdueStatus")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PaymentInfo")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("PaymentStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

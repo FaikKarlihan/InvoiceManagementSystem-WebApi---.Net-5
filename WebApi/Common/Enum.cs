@@ -1,6 +1,5 @@
 namespace WebApi.Common
 {
-
     // Users
     public enum Role
     {
@@ -19,5 +18,22 @@ namespace WebApi.Common
         OnePlusOne = 0,
         TwoPlusOne = 1,
         ThreePlusOne = 2
+    }
+
+    // Invoice
+    public enum InvoiceType
+    {
+        Dues = 1,
+        Bill = 2
+    }
+    public enum PaymentStatus
+    {
+        NotPaid = 1,
+        Paid = 2
+    }
+    public enum OverdueStatus
+    {
+        NotOverdue = 1,
+        Overdue = 2
     }
 }
