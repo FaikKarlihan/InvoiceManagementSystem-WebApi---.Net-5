@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/InvoiceManagementSystemSln.sln",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary;ForceNoAlign"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "publish",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "publish",
+        "${workspaceFolder}/InvoiceManagementSystemSln.sln",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary;ForceNoAlign"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "watch",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "watch",
+        "run",
+        "--project",
+        "${workspaceFolder}/InvoiceManagementSystemSln.sln"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run User API",
+      "type": "shell",
+      "command": "dotnet run --project ./WebApi/WebApi.csproj",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Payment API",
+      "type": "shell",
+      "command": "dotnet run --project ./PaymentApi/PaymentApi.csproj",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Both APIs",
+      "dependsOn": ["Run User API", "Run Payment API"],
+      "dependsOrder": "parallel"
+    }
+  ]
+}
